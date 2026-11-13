@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tune N' Teach</title>
+  <link rel="stylesheet" href="3_styles/style.css" />
+</head>
+<body>
+  <header class="top-bar">
+    <button id="home-btn" class="nav-btn hidden" type="button">← Home</button>
+    <h1 id="page-title">Tune N' Teach</h1>
+  </header>
+
+  <main id="app-container">
+    <!-- HOME VIEW -->
+    <section id="view-home" class="view active">
+      <p class="subtitle">Choose your instrument or jump into your lessons.</p>
+      <div class="card-grid">
+        <button class="choice-card" data-target="tuner" data-guitar="Acoustic Guitar" type="button">
+          <img
+            src="4_images/chris-hardy-VY0XY_DNwqc-unsplash.jpg"
+            alt="Acoustic Guitar"
+          />
+          <div class="card-label">Acoustic Guitar</div>
+        </button>
+
+        <button class="choice-card" data-target="tuner" data-guitar="Electric Guitar" type="button">
+          <img
+            src="4_images/krzysztof-hepner-ZIGI-0Br8Bg-unsplash.jpg"
+            alt="Electric Guitar"
+          />
+          <div class="card-label">Electric Guitar</div>
+        </button>
+
+        <button class="choice-card lessons-card" data-target="lessons" type="button">
+          <div class="lessons-icon">▶</div>
+          <div class="card-label">Song Lessons</div>
+          <p class="card-hint">Saved YouTube tutorials & progress</p>
+        </button>
+      </div>
+    </section>
+
+    <!-- TUNER VIEW (Fender Tune Style) -->
+    <section id="view-tuner" class="view">
+      <div class="tuner-controls">
+        <label for="preset-select">Tuning Preset:</label>
+        <select id="preset-select"></select>
+        <button id="mic-toggle-btn" class="primary-btn" type="button">Start Mic</button>
+      </div>
+
+      <div class="tuner-stage">
+        <div id="status-text" class="status-text">Select a string or start mic</div>
+
+        <!-- Horizontal Slider Track -->
+        <div class="meter-track">
+          <div class="center-marker"></div>
+          <div id="tuning-circle" class="tuning-circle"></div>
+        </div>
+        <div class="meter-labels">
+          <span>♭ Flat (Too Low)</span>
+          <span>In Tune</span>
+          <span>♯ Sharp (Too High)</span>
+        </div>
+
+        <div class="freq-readout">
+          Target: <strong id="target-freq">--</strong> Hz
+        </div>
+      </div>
+
+      <!-- Bottom String Buttons -->
+      <div id="string-buttons" class="string-row"></div>
+    </section>
+
+    <!-- LESSONS VIEW -->
+    <section id="view-lessons" class="view">
+      <form id="lesson-form" class="lesson-form">
+        <input id="lesson-title" type="text" placeholder="Song Title (e.g., Blackbird)" required />
+        <input id="lesson-url" type="url" placeholder="YouTube URL (https://...)" required />
+        <select id="lesson-status">
+          <option value="learning">Actively Learning</option>
+          <option value="known">Songs I Know</option>
+        </select>
+        <button class="primary-btn" type="submit">Add Lesson</button>
+      </form>
+
+      <div class="lessons-columns">
+        <div class="lesson-bucket">
+          <h2>Actively Learning</h2>
+          <ul id="list-learning" class="lesson-list"></ul>
+        </div>
+        <div class="lesson-bucket">
+          <h2>Songs I Know</h2>
+          <ul id="list-known" class="lesson-list"></ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Scripts loaded in numbered order -->
+  <script src="2_scripts/1_data.js"></script>
+  <script src="2_scripts/2_rules.js"></script>
+  <script src="2_scripts/3_display.js"></script>
+  <script src="2_scripts/4_start.js"></script>
+</body>
+</html>

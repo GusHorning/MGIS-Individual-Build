@@ -1,0 +1,305 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background-color: #121417;
+  color: #f4f4f6;
+  min-height: 100vh;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 1rem;
+  background-color: #1c1f24;
+  border-bottom: 1px solid #2c313a;
+}
+
+.top-bar h1 {
+  font-size: 1.35rem;
+}
+
+.nav-btn {
+  position: absolute;
+  left: 1rem;
+  background: #2c313a;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 0.85rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
+#app-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
+}
+
+.subtitle {
+  text-align: center;
+  color: #a8b0bd;
+  margin-bottom: 1.5rem;
+}
+
+/* Home Cards */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.25rem;
+}
+
+.choice-card {
+  background: #1c1f24;
+  border: 1px solid #2c313a;
+  border-radius: 12px;
+  overflow: hidden;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 1.15rem;
+  min-height: 440px;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.choice-card:hover {
+  transform: translateY(-3px);
+  border-color: #eab308;
+}
+
+.choice-card img {
+  width: 100%;
+  height: 375px;
+  object-fit: cover;
+  object-position: center;
+  background-color: #16181d;
+  margin-bottom: 0.85rem;
+}
+
+.lessons-card {
+  justify-content: center;
+  min-height: 440px;
+  padding: 1.5rem;
+}
+
+.lessons-icon {
+  font-size: 3rem;
+  color: #eab308;
+  margin-bottom: 0.85rem;
+}
+
+.card-label {
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.card-hint {
+  font-size: 0.85rem;
+  color: #a8b0bd;
+  margin-top: 0.35rem;
+}
+
+/* Fender Tune Style Meter */
+.tuner-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+select,
+input {
+  background: #1c1f24;
+  color: #fff;
+  border: 1px solid #2c313a;
+  padding: 0.6rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.primary-btn {
+  background: #eab308;
+  color: #121417;
+  font-weight: 600;
+  border: none;
+  padding: 0.6rem 1.1rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.tuner-stage {
+  background: #1c1f24;
+  border: 1px solid #2c313a;
+  border-radius: 14px;
+  padding: 2rem 1.25rem;
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.status-text {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.meter-track {
+  position: relative;
+  height: 14px;
+  background: #2c313a;
+  border-radius: 999px;
+  margin: 1.5rem auto 0.75rem;
+  max-width: 500px;
+}
+
+.center-marker {
+  position: absolute;
+  left: 50%;
+  top: -8px;
+  bottom: -8px;
+  width: 4px;
+  background: #f4f4f6;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+
+.tuning-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #6b7280;
+  transform: translate(-50%, -50%);
+  transition: left 0.1s ease, background-color 0.15s ease;
+}
+
+.tuning-circle.flat,
+.tuning-circle.sharp {
+  background: #eab308; /* Yellow when off-pitch */
+  box-shadow: 0 0 12px rgba(234, 179, 8, 0.6);
+}
+
+.tuning-circle.perfect {
+  background: #22c55e; /* Green when in tune */
+  box-shadow: 0 0 14px rgba(34, 197, 94, 0.8);
+}
+
+.meter-labels {
+  display: flex;
+  justify-content: space-between;
+  max-width: 500px;
+  margin: 0 auto 1.25rem;
+  font-size: 0.8rem;
+  color: #a8b0bd;
+}
+
+.freq-readout {
+  color: #a8b0bd;
+  font-size: 0.95rem;
+}
+
+/* Bottom String Buttons */
+.string-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.5rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.string-btn {
+  background: #1c1f24;
+  color: #f4f4f6;
+  border: 2px solid #2c313a;
+  border-radius: 50%;
+  aspect-ratio: 1 / 1;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.string-btn.selected {
+  border-color: #eab308;
+  background: #282c34;
+}
+
+/* Lessons Section */
+.lesson-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.lesson-form input {
+  flex: 1 1 200px;
+}
+
+.lessons-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+
+.lesson-bucket {
+  background: #1c1f24;
+  border: 1px solid #2c313a;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.lesson-bucket h2 {
+  font-size: 1.05rem;
+  margin-bottom: 0.75rem;
+  color: #eab308;
+}
+
+.lesson-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.empty-msg {
+  color: #a8b0bd;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.lesson-item a {
+  display: block;
+  padding: 0.6rem 0.75rem;
+  background: #262a31;
+  border-radius: 6px;
+  color: #f4f4f6;
+  text-decoration: none;
+}
+
+.lesson-item a:hover {
+  background: #323741;
+  color: #eab308;
+}
