@@ -1,6 +1,9 @@
-// PRESENTATION LAYER: Updates the DOM and visual state
+// PRESENTATION LAYER: Updates the DOM, guitar body outline, tuner circle, and plays reference tones
 
 const Display = {
+  audioCtx: null,
+  visualOffset: 0,
+
   showView(viewName, customTitle) {
     document.querySelectorAll(".view").forEach((el) => el.classList.remove("active"));
     const targetView = document.getElementById(`view-${viewName}`);
@@ -15,6 +18,27 @@ const Display = {
     } else {
       homeBtn.classList.remove("hidden");
       titleEl.textContent = customTitle || "Tune N' Teach";
+    }
+  },
+
+  setGuitarBodyShape(guitarType) {
+    const frame = document.getElementById("guitar-body-frame");
+    frame.classList.remove("acoustic", "electric");
+    if (guitarType === "Electric Guitar") {
+      frame.classList.add("electric");
+    } else {
+      frame.classList.add("acoustic");
+    }
+  },
+
+  setMicButtonState(isListening) {
+    const btn = document.getElementById("mic-toggle-btn");
+    if (isListening) {
+      btn.textContent = "Stop Mic";
+      btn.classList.add("listening");
+    } else {
+      btn.textContent = "Start Mic";
+      btn.classList.remove("listening");
     }
   },
 
@@ -37,13 +61,16 @@ const Display = {
       btn.type = "button";
       btn.className = `string-btn ${idx === selectedIndex ? "selected" : ""}`;
       btn.textContent = str.note;
+      btn.title = `Hear ${str.note} (${str.freq} Hz)`;
       btn.addEventListener("click", () => onSelect(idx));
       container.appendChild(btn);
     });
   },
 
-  updateTunerMeter(targetFreq, evaluation) {
-    document.getElementById("target-freq").textContent = targetFreq ? targetFreq.toFixed(2) : "--";
+  updateTunerMeter(targetNote, targetFreq, detectedFreq, evaluation) {
+    document.getElementById("target-note-display").textContent = targetNote || "--";
+    document.getElementById("target-freq").textContent = targetFreq ? targetFreq.toFixed(1) : "--";
+    document.getElementById("detected-freq").textContent = detectedFreq ? detectedFreq.toFixed(1) : "--";
     document.getElementById("status-text").textContent = evaluation.label;
 
     const circle = document.getElementById("tuning-circle");
@@ -53,8 +80,57 @@ const Display = {
       circle.classList.add(evaluation.state);
     }
 
-    // Center is 50%; shift left or right by offsetPercent
-    circle.style.left = `calc(50% + ${evaluation.offsetPercent}%)`;
+    // Gently glide toward target offset so the circle moves calmly instead of jumping
+    if (evaluation.state === "idle") {
+      this.visualOffset = 0;
+    } else {
+      this.visualOffset = this.visualOffset * 0.78 + evaluation.offsetPercent * 0.22;
+    }
+
+    // Center is 50%; shift left or right by smoothed visualOffset (clamped inside the track)
+    const clampedOffset = Math.max(-36, Math.min(36, this.visualOffset));
+    circle.style.left = `calc(50% + ${clampedOffset}%)`;
+  },
+
+  // Plays a warm plucked-style reference tone when a string circle is clicked/tapped
+  playReferenceNote(freq) {
+    if (!freq) return;
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!this.audioCtx) {
+      this.audioCtx = new AudioContextClass();
+    }
+    if (this.audioCtx.state === "suspended") {
+      this.audioCtx.resume();
+    }
+
+    const now = this.audioCtx.currentTime;
+    const osc = this.audioCtx.createOscillator();
+    const overtone = this.audioCtx.createOscillator();
+    const gain = this.audioCtx.createGain();
+    const overtoneGain = this.audioCtx.createGain();
+
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(freq, now);
+
+    overtone.type = "sine";
+    overtone.frequency.setValueAtTime(freq * 2, now);
+
+    gain.gain.setValueAtTime(0.001, now);
+    gain.gain.exponentialRampToValueAtTime(0.28, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0008, now + 1.4);
+
+    overtoneGain.gain.setValueAtTime(0.06, now);
+    overtoneGain.gain.exponentialRampToValueAtTime(0.0005, now + 0.6);
+
+    osc.connect(gain);
+    overtone.connect(overtoneGain);
+    overtoneGain.connect(gain);
+    gain.connect(this.audioCtx.destination);
+
+    osc.start(now);
+    overtone.start(now);
+    osc.stop(now + 1.45);
+    overtone.stop(now + 1.45);
   },
 
   renderLessons(lessons) {

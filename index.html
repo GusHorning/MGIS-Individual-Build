@@ -41,35 +41,45 @@
       </div>
     </section>
 
-    <!-- TUNER VIEW (Fender Tune Style) -->
+    <!-- TUNER VIEW (Guitar Body Style) -->
     <section id="view-tuner" class="view">
       <div class="tuner-controls">
-        <label for="preset-select">Tuning Preset:</label>
+        <label for="preset-select">Tuning:</label>
         <select id="preset-select"></select>
         <button id="mic-toggle-btn" class="primary-btn" type="button">Start Mic</button>
       </div>
 
-      <div class="tuner-stage">
-        <div id="status-text" class="status-text">Select a string or start mic</div>
+      <div id="status-text" class="status-text">Tap Start Mic to auto-detect, or tap a note below to hear it</div>
 
-        <!-- Horizontal Slider Track -->
-        <div class="meter-track">
-          <div class="center-marker"></div>
-          <div id="tuning-circle" class="tuning-circle"></div>
+      <!-- Guitar Body Container -->
+      <div id="guitar-body-frame" class="guitar-body acoustic">
+        <!-- Traditional Dreadnought Acoustic Guitar Body Outline -->
+        <svg class="body-svg acoustic-svg" viewBox="0 0 500 540" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M 198,10 L 302,10 C 318,22 396,38 418,104 C 434,152 406,196 392,226 C 380,252 386,272 426,314 C 474,366 478,468 408,510 C 356,536 144,536 92,510 C 22,468 26,366 74,314 C 114,272 120,252 108,226 C 94,196 66,152 82,104 C 104,38 182,22 198,10 Z" />
+        </svg>
+
+        <!-- Fender Stratocaster Electric Guitar Body Outline -->
+        <svg class="body-svg electric-svg" viewBox="0 0 500 540" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M 208,10 L 292,10 L 292,98 C 304,104 316,96 326,80 C 338,60 356,56 368,68 C 382,82 374,124 358,158 C 344,188 346,218 378,256 C 422,308 446,388 412,456 C 384,510 318,530 250,524 C 218,522 196,532 162,530 C 104,526 56,478 52,414 C 48,348 86,296 122,250 C 148,216 148,180 128,136 C 104,84 96,34 118,24 C 138,16 158,48 176,82 C 186,100 198,104 208,98 Z" />
+        </svg>
+
+        <!-- Top Target Note Zone -->
+        <div class="target-zone">
+          <div class="center-guide"></div>
+          <div id="tuning-circle" class="tuning-circle">
+            <span id="target-note-display">--</span>
+          </div>
         </div>
+
         <div class="meter-labels">
-          <span>♭ Flat (Too Low)</span>
-          <span>In Tune</span>
-          <span>♯ Sharp (Too High)</span>
+          <span>♭ Flat</span>
+          <span class="freq-readout"><strong id="detected-freq">--</strong> / <span id="target-freq">--</span> Hz</span>
+          <span>♯ Sharp</span>
         </div>
 
-        <div class="freq-readout">
-          Target: <strong id="target-freq">--</strong> Hz
-        </div>
+        <!-- Bottom 6 Note Circles -->
+        <div id="string-buttons" class="string-row"></div>
       </div>
-
-      <!-- Bottom String Buttons -->
-      <div id="string-buttons" class="string-row"></div>
     </section>
 
     <!-- LESSONS VIEW -->
