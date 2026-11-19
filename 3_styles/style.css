@@ -163,18 +163,18 @@ input {
   color: #f4f4f6;
 }
 
-/* Larger Guitar-Shaped Tuner Stage */
+/* Guitar-Shaped Tuner Stage */
 .guitar-body {
   position: relative;
   width: 100%;
-  max-width: 580px;
-  height: 560px;
+  max-width: 600px;
+  height: 575px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  padding: 5.5rem 2.25rem 3.5rem;
+  justify-content: flex-start;
+  padding: 6.25rem 2rem 6.25rem;
 }
 
 .body-svg {
@@ -204,23 +204,20 @@ input {
 
 .guitar-body.acoustic .body-svg path {
   stroke: #eab308;
-  stroke-opacity: 0.65;
+  stroke-opacity: 0.7;
 }
 
 .guitar-body.electric .body-svg path {
   stroke: #38bdf8;
-  stroke-opacity: 0.65;
+  stroke-opacity: 0.7;
 }
 
-/* Soundhole / Moving Target Circle Area */
+/* Open Target Note Zone (No Outer Box) */
 .target-zone {
   position: relative;
   z-index: 2;
-  width: 78%;
-  height: 145px;
-  border-radius: 999px;
-  background: rgba(18, 20, 23, 0.75);
-  border: 2px solid #2c313a;
+  width: 52%;
+  height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -229,10 +226,10 @@ input {
 .center-guide {
   position: absolute;
   left: 50%;
-  top: 10px;
-  bottom: 10px;
+  top: 8px;
+  bottom: 8px;
   width: 2px;
-  background: rgba(244, 244, 246, 0.25);
+  background: rgba(244, 244, 246, 0.22);
   transform: translateX(-50%);
 }
 
@@ -240,20 +237,20 @@ input {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 108px;
-  height: 108px;
+  width: 102px;
+  height: 102px;
   border-radius: 50%;
   background: #2c313a;
   border: 4px solid #9ca3af;
   color: #f4f4f6;
-  font-size: 2rem;
+  font-size: 1.9rem;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
   transform: translate(-50%, -50%);
   transition: left 0.35s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.25s ease, border-color 0.25s ease;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
 }
 
 .tuning-circle.flat,
@@ -271,32 +268,35 @@ input {
   box-shadow: 0 0 26px rgba(34, 197, 94, 0.85);
 }
 
+/* Flat / Hz / Sharp Row Tucked Inside Upper Bout */
 .meter-labels {
   position: relative;
   z-index: 2;
-  width: 74%;
+  width: 48%;
+  margin-top: 0.45rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: #a8b0bd;
+  white-space: nowrap;
 }
 
 .freq-readout {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   color: #d1d5db;
 }
 
-/* Bottom 6 Note Circles (No Box or String Lines) */
+/* 6 Note Circles Raised Into the Wide Belly of Both Guitars */
 .string-row {
   position: relative;
   z-index: 2;
-  width: 82%;
+  width: 66%;
+  margin-top: auto;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 0.55rem;
+  gap: 0.45rem;
   align-items: center;
-  margin-top: auto;
 }
 
 .string-btn {
@@ -307,8 +307,11 @@ input {
   width: 100%;
   aspect-ratio: 1 / 1;
   font-weight: 800;
-  font-size: 1.05rem;
+  font-size: 1rem;
   cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -317,7 +320,7 @@ input {
 }
 
 .string-btn:hover {
-  transform: scale(1.07);
+  transform: scale(1.06);
   border-color: #eab308;
 }
 
@@ -327,25 +330,42 @@ input {
   color: #fde047;
 }
 
-@media (max-width: 480px) {
+.string-btn.holding {
+  transform: scale(0.95);
+  background: #eab308;
+  color: #121417;
+  border-color: #fef08a;
+}
+
+@media (max-width: 520px) {
   .guitar-body {
-    height: 490px;
-    padding: 4.5rem 1.25rem 2.75rem;
+    height: 495px;
+    padding: 5.25rem 1rem 5.15rem;
+  }
+
+  .target-zone {
+    width: 56%;
+    height: 98px;
   }
 
   .tuning-circle {
-    width: 88px;
-    height: 88px;
-    font-size: 1.6rem;
+    width: 82px;
+    height: 82px;
+    font-size: 1.5rem;
+  }
+
+  .meter-labels {
+    width: 54%;
+    font-size: 0.75rem;
   }
 
   .string-row {
-    width: 88%;
-    gap: 0.35rem;
+    width: 72%;
+    gap: 0.3rem;
   }
 
   .string-btn {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
   }
 }
 

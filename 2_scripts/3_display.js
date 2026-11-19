@@ -1,7 +1,8 @@
-// PRESENTATION LAYER: Updates the DOM, guitar body outline, tuner circle, and plays reference tones
+// PRESENTATION LAYER: Updates the DOM, guitar body outline, tuner circle, and sustained reference tones
 
 const Display = {
   audioCtx: null,
+  activeTone: null,
   visualOffset: 0,
 
   showView(viewName, customTitle) {
@@ -42,6 +43,35 @@ const Display = {
     }
   },
 
+  renderStringButtons(strings, selectedIndex, onPressStart, onPressEnd) {
+    const container = document.getElementById("string-buttons");
+    container.innerHTML = "";
+    strings.forEach((str, idx) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = `string-btn ${idx === selectedIndex ? "selected" : ""}`;
+      btn.textContent = str.note;
+      btn.title = `Press and hold to hear ${str.note} (${str.freq} Hz)`;
+
+      btn.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        btn.classList.add("holding");
+        if (onPressStart) onPressStart(idx);
+      });
+
+      const release = () => {
+        btn.classList.remove("holding");
+        if (onPressEnd) onPressEnd();
+      };
+
+      btn.addEventListener("pointerup", release);
+      btn.addEventListener("pointerleave", release);
+      btn.addEventListener("pointercancel", release);
+
+      container.appendChild(btn);
+    });
+  },
+
   renderPresetDropdown(presets) {
     const select = document.getElementById("preset-select");
     select.innerHTML = "";
@@ -50,20 +80,6 @@ const Display = {
       option.value = preset.id;
       option.textContent = preset.name;
       select.appendChild(option);
-    });
-  },
-
-  renderStringButtons(strings, selectedIndex, onSelect) {
-    const container = document.getElementById("string-buttons");
-    container.innerHTML = "";
-    strings.forEach((str, idx) => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = `string-btn ${idx === selectedIndex ? "selected" : ""}`;
-      btn.textContent = str.note;
-      btn.title = `Hear ${str.note} (${str.freq} Hz)`;
-      btn.addEventListener("click", () => onSelect(idx));
-      container.appendChild(btn);
     });
   },
 
@@ -87,14 +103,16 @@ const Display = {
       this.visualOffset = this.visualOffset * 0.78 + evaluation.offsetPercent * 0.22;
     }
 
-    // Center is 50%; shift left or right by smoothed visualOffset (clamped inside the track)
-    const clampedOffset = Math.max(-36, Math.min(36, this.visualOffset));
+    // Center is 50%; clamp travel so the circle stays inside the upper guitar bout
+    const clampedOffset = Math.max(-28, Math.min(28, this.visualOffset));
     circle.style.left = `calc(50% + ${clampedOffset}%)`;
   },
 
-  // Plays a warm plucked-style reference tone when a string circle is clicked/tapped
-  playReferenceNote(freq) {
+  // Starts playing a sustained reference tone while the user holds down a string circle
+  startReferenceNote(freq) {
     if (!freq) return;
+    this.stopReferenceNote();
+
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     if (!this.audioCtx) {
       this.audioCtx = new AudioContextClass();
@@ -106,7 +124,7 @@ const Display = {
     const now = this.audioCtx.currentTime;
     const osc = this.audioCtx.createOscillator();
     const overtone = this.audioCtx.createOscillator();
-    const gain = this.audioCtx.createGain();
+    const masterGain = this.audioCtx.createGain();
     const overtoneGain = this.audioCtx.createGain();
 
     osc.type = "triangle";
@@ -115,22 +133,37 @@ const Display = {
     overtone.type = "sine";
     overtone.frequency.setValueAtTime(freq * 2, now);
 
-    gain.gain.setValueAtTime(0.001, now);
-    gain.gain.exponentialRampToValueAtTime(0.28, now + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.0008, now + 1.4);
+    // Smooth fade-in and sustain until released
+    masterGain.gain.setValueAtTime(0.001, now);
+    masterGain.gain.exponentialRampToValueAtTime(0.24, now + 0.04);
 
-    overtoneGain.gain.setValueAtTime(0.06, now);
-    overtoneGain.gain.exponentialRampToValueAtTime(0.0005, now + 0.6);
+    overtoneGain.gain.setValueAtTime(0.05, now);
 
-    osc.connect(gain);
+    osc.connect(masterGain);
     overtone.connect(overtoneGain);
-    overtoneGain.connect(gain);
-    gain.connect(this.audioCtx.destination);
+    overtoneGain.connect(masterGain);
+    masterGain.connect(this.audioCtx.destination);
 
     osc.start(now);
     overtone.start(now);
-    osc.stop(now + 1.45);
-    overtone.stop(now + 1.45);
+
+    this.activeTone = { osc, overtone, masterGain };
+  },
+
+  // Smoothly stops the sustained reference tone when the user lets go
+  stopReferenceNote() {
+    if (!this.activeTone || !this.audioCtx) return;
+
+    const { osc, overtone, masterGain } = this.activeTone;
+    this.activeTone = null;
+
+    const now = this.audioCtx.currentTime;
+    masterGain.gain.cancelScheduledValues(now);
+    masterGain.gain.setValueAtTime(Math.max(masterGain.gain.value, 0.001), now);
+    masterGain.gain.exponentialRampToValueAtTime(0.0005, now + 0.12);
+
+    osc.stop(now + 0.14);
+    overtone.stop(now + 0.14);
   },
 
   renderLessons(lessons) {

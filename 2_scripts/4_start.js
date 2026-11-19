@@ -11,11 +11,15 @@ let micAnimationId = null;
 let isListening = false;
 let smoothedFreq = null;
 
-function handleStringTap(index) {
+function handleStringPressStart(index) {
   selectedStringIndex = index;
   const activeString = currentPreset.strings[selectedStringIndex];
-  Display.renderStringButtons(currentPreset.strings, selectedStringIndex, handleStringTap);
-  Display.playReferenceNote(activeString.freq);
+  Display.startReferenceNote(activeString.freq);
+
+  // Highlight selected circle without rebuilding buttons mid-press
+  document.querySelectorAll(".string-btn").forEach((btn, idx) => {
+    btn.classList.toggle("selected", idx === selectedStringIndex);
+  });
 
   if (!isListening) {
     Display.updateTunerMeter(activeString.note, activeString.freq, null, {
@@ -26,16 +30,34 @@ function handleStringTap(index) {
   }
 }
 
+function handleStringPressEnd() {
+  Display.stopReferenceNote();
+
+  if (!isListening && currentPreset) {
+    const activeString = currentPreset.strings[selectedStringIndex];
+    Display.updateTunerMeter(activeString.note, activeString.freq, null, {
+      offsetPercent: 0,
+      state: "idle",
+      label: "Tap Start Mic or press and hold a note below"
+    });
+  }
+}
+
 function selectPreset(presetId) {
   currentPreset = DataStore.presets.find((p) => p.id === presetId) || DataStore.presets[0];
   if (currentPreset) {
     selectedStringIndex = 0;
     const firstString = currentPreset.strings[0];
-    Display.renderStringButtons(currentPreset.strings, selectedStringIndex, handleStringTap);
+    Display.renderStringButtons(
+      currentPreset.strings,
+      selectedStringIndex,
+      handleStringPressStart,
+      handleStringPressEnd
+    );
     Display.updateTunerMeter(firstString.note, firstString.freq, null, {
       offsetPercent: 0,
       state: "idle",
-      label: isListening ? "Listening — pluck any string" : "Tap Start Mic or tap a note below"
+      label: isListening ? "Listening — pluck any string" : "Tap Start Mic or press and hold a note below"
     });
   }
 }
@@ -49,7 +71,7 @@ function listenLoop() {
   const rawFreq = TunerRules.detectPitch(buffer, micAudioContext.sampleRate);
 
   if (rawFreq && currentPreset) {
-    // Smooth frequency changes more heavily so the tuning circle glides calmly
+    // Smooth frequency changes heavily so the tuning circle glides calmly
     if (!smoothedFreq || Math.abs(rawFreq - smoothedFreq) > 18) {
       smoothedFreq = rawFreq;
     } else {
@@ -60,7 +82,12 @@ function listenLoop() {
     if (match) {
       if (match.index !== selectedStringIndex) {
         selectedStringIndex = match.index;
-        Display.renderStringButtons(currentPreset.strings, selectedStringIndex, handleStringTap);
+        Display.renderStringButtons(
+          currentPreset.strings,
+          selectedStringIndex,
+          handleStringPressStart,
+          handleStringPressEnd
+        );
       }
 
       const evaluation = TunerRules.evaluatePitch(smoothedFreq, match.stringObj.freq);
@@ -140,7 +167,7 @@ function stopMicrophone() {
     Display.updateTunerMeter(activeString.note, activeString.freq, null, {
       offsetPercent: 0,
       state: "idle",
-      label: "Mic paused — tap Start Mic or tap a note below"
+      label: "Mic paused — tap Start Mic or press and hold a note below"
     });
   }
 }
@@ -166,9 +193,10 @@ async function initApp() {
     });
   });
 
-  // Back to Home button (also stops mic cleanly)
+  // Back to Home button (also stops mic and any held note cleanly)
   document.getElementById("home-btn").addEventListener("click", () => {
     if (isListening) stopMicrophone();
+    Display.stopReferenceNote();
     Display.showView("home");
   });
 
