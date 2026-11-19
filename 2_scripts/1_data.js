@@ -1,8 +1,17 @@
-// DATA LAYER: Loads tuning presets and manages saved lessons
+// DATA LAYER: Loads tuning presets, saves per-guitar last-used tunings, and persists saved lessons
 
 const DataStore = {
   presets: [],
   lessons: [],
+  guitarTunings: {
+    "Acoustic Guitar": "standard",
+    "Electric Guitar": "standard"
+  },
+
+  STORAGE_KEYS: {
+    TUNINGS: "tuneNTeach_guitarTunings",
+    LESSONS: "tuneNTeach_lessons"
+  },
 
   defaultPresets() {
     return [
@@ -55,6 +64,45 @@ const DataStore = {
       // Fallback when opened directly from file:// instead of a web server
       this.presets = this.defaultPresets();
     }
+    this.loadSavedState();
     return this.presets;
+  },
+
+  loadSavedState() {
+    try {
+      const savedTunings = localStorage.getItem(this.STORAGE_KEYS.TUNINGS);
+      if (savedTunings) {
+        this.guitarTunings = { ...this.guitarTunings, ...JSON.parse(savedTunings) };
+      }
+      const savedLessons = localStorage.getItem(this.STORAGE_KEYS.LESSONS);
+      if (savedLessons) {
+        this.lessons = JSON.parse(savedLessons) || [];
+      }
+    } catch (err) {
+      // Ignore storage errors in private browsing
+    }
+  },
+
+  getGuitarTuning(guitarType) {
+    return this.guitarTunings[guitarType] || (this.presets[0] && this.presets[0].id) || "standard";
+  },
+
+  saveGuitarTuning(guitarType, presetId) {
+    if (!guitarType || !presetId) return;
+    this.guitarTunings[guitarType] = presetId;
+    try {
+      localStorage.setItem(this.STORAGE_KEYS.TUNINGS, JSON.stringify(this.guitarTunings));
+    } catch (err) {
+      // Ignore storage errors
+    }
+  },
+
+  addLesson(lesson) {
+    this.lessons.push(lesson);
+    try {
+      localStorage.setItem(this.STORAGE_KEYS.LESSONS, JSON.stringify(this.lessons));
+    } catch (err) {
+      // Ignore storage errors
+    }
   }
 };

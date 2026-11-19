@@ -74,6 +74,8 @@ body {
   overflow: hidden;
   color: #fff;
   cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -94,6 +96,10 @@ body {
   object-position: center;
   background-color: #16181d;
   margin-bottom: 0.85rem;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
 }
 
 .lessons-card {
@@ -212,12 +218,12 @@ input {
   stroke-opacity: 0.7;
 }
 
-/* Open Target Note Zone (No Outer Box) */
+/* Open Target Note Zone */
 .target-zone {
   position: relative;
   z-index: 2;
-  width: 52%;
-  height: 120px;
+  width: 46%;
+  height: 116px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -237,13 +243,13 @@ input {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 102px;
-  height: 102px;
+  width: 98px;
+  height: 98px;
   border-radius: 50%;
   background: #2c313a;
   border: 4px solid #9ca3af;
   color: #f4f4f6;
-  font-size: 1.9rem;
+  font-size: 1.85rem;
   font-weight: 800;
   display: flex;
   align-items: center;
@@ -268,22 +274,22 @@ input {
   box-shadow: 0 0 26px rgba(34, 197, 94, 0.85);
 }
 
-/* Flat / Hz / Sharp Row Tucked Inside Upper Bout */
+/* Flat / Hz / Sharp Row Tucked Cleanly Inside Both Guitars */
 .meter-labels {
   position: relative;
   z-index: 2;
-  width: 48%;
+  width: 39%;
   margin-top: 0.45rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   color: #a8b0bd;
   white-space: nowrap;
 }
 
 .freq-readout {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   color: #d1d5db;
 }
 
@@ -291,7 +297,7 @@ input {
 .string-row {
   position: relative;
   z-index: 2;
-  width: 66%;
+  width: 64%;
   margin-top: auto;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -344,23 +350,23 @@ input {
   }
 
   .target-zone {
-    width: 56%;
-    height: 98px;
+    width: 50%;
+    height: 94px;
   }
 
   .tuning-circle {
-    width: 82px;
-    height: 82px;
-    font-size: 1.5rem;
+    width: 80px;
+    height: 80px;
+    font-size: 1.45rem;
   }
 
   .meter-labels {
-    width: 54%;
-    font-size: 0.75rem;
+    width: 45%;
+    font-size: 0.72rem;
   }
 
   .string-row {
-    width: 72%;
+    width: 70%;
     gap: 0.3rem;
   }
 
@@ -415,14 +421,27 @@ input {
 
 .lesson-item a {
   display: block;
-  padding: 0.6rem 0.75rem;
+  padding: 0.7rem 0.85rem;
   background: #262a31;
-  border-radius: 6px;
+  border-radius: 8px;
   color: #f4f4f6;
   text-decoration: none;
 }
 
 .lesson-item a:hover {
   background: #323741;
+}
+
+.lesson-title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.lesson-item a:hover .lesson-title {
   color: #eab308;
+}
+
+.lesson-meta {
+  font-size: 0.8rem;
+  color: #a8b0bd;
 }

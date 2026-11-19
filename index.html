@@ -21,6 +21,7 @@
           <img
             src="4_images/chris-hardy-VY0XY_DNwqc-unsplash.jpg"
             alt="Acoustic Guitar"
+            draggable="false"
           />
           <div class="card-label">Acoustic Guitar</div>
         </button>
@@ -29,6 +30,7 @@
           <img
             src="4_images/krzysztof-hepner-ZIGI-0Br8Bg-unsplash.jpg"
             alt="Electric Guitar"
+            draggable="false"
           />
           <div class="card-label">Electric Guitar</div>
         </button>
@@ -49,7 +51,7 @@
         <button id="mic-toggle-btn" class="primary-btn" type="button">Start Mic</button>
       </div>
 
-      <div id="status-text" class="status-text">Tap Start Mic to auto-detect, or tap a note below to hear it</div>
+      <div id="status-text" class="status-text">Tap Start Mic to auto-detect, or press and hold a note below</div>
 
       <!-- Guitar Body Container -->
       <div id="guitar-body-frame" class="guitar-body acoustic">
@@ -87,7 +89,27 @@
       <form id="lesson-form" class="lesson-form">
         <input id="lesson-title" type="text" placeholder="Song Title (e.g., Blackbird)" required />
         <input id="lesson-url" type="url" placeholder="YouTube URL (https://...)" required />
-        <select id="lesson-status">
+        <select id="lesson-instrument" aria-label="Instrument">
+          <option value="Acoustic Guitar">Acoustic Guitar</option>
+          <option value="Electric Guitar">Electric Guitar</option>
+        </select>
+        <select id="lesson-tuning" aria-label="Tuning"></select>
+        <select id="lesson-capo" aria-label="Capo">
+          <option value="No Capo">No Capo</option>
+          <option value="Capo 1">Capo 1</option>
+          <option value="Capo 2">Capo 2</option>
+          <option value="Capo 3">Capo 3</option>
+          <option value="Capo 4">Capo 4</option>
+          <option value="Capo 5">Capo 5</option>
+          <option value="Capo 6">Capo 6</option>
+          <option value="Capo 7">Capo 7</option>
+          <option value="Capo 8">Capo 8</option>
+          <option value="Capo 9">Capo 9</option>
+          <option value="Capo 10">Capo 10</option>
+          <option value="Capo 11">Capo 11</option>
+          <option value="Capo 12">Capo 12</option>
+        </select>
+        <select id="lesson-status" aria-label="Progress List">
           <option value="learning">Actively Learning</option>
           <option value="known">Songs I Know</option>
         </select>

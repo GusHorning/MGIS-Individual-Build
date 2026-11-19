@@ -1,4 +1,4 @@
-// PRESENTATION LAYER: Updates the DOM, guitar body outline, tuner circle, and sustained reference tones
+// PRESENTATION LAYER: Updates the DOM, guitar body outline, tuner circle, sustained reference tones, and lessons
 
 const Display = {
   audioCtx: null,
@@ -73,14 +73,26 @@ const Display = {
   },
 
   renderPresetDropdown(presets) {
-    const select = document.getElementById("preset-select");
-    select.innerHTML = "";
-    presets.forEach((preset) => {
-      const option = document.createElement("option");
-      option.value = preset.id;
-      option.textContent = preset.name;
-      select.appendChild(option);
+    const tunerSelect = document.getElementById("preset-select");
+    const lessonTuningSelect = document.getElementById("lesson-tuning");
+
+    [tunerSelect, lessonTuningSelect].forEach((select) => {
+      if (!select) return;
+      select.innerHTML = "";
+      presets.forEach((preset) => {
+        const option = document.createElement("option");
+        option.value = select === lessonTuningSelect ? preset.name : preset.id;
+        option.textContent = preset.name;
+        select.appendChild(option);
+      });
     });
+  },
+
+  setSelectedPresetValue(presetId) {
+    const select = document.getElementById("preset-select");
+    if (select) {
+      select.value = presetId;
+    }
   },
 
   updateTunerMeter(targetNote, targetFreq, detectedFreq, evaluation) {
@@ -96,19 +108,16 @@ const Display = {
       circle.classList.add(evaluation.state);
     }
 
-    // Gently glide toward target offset so the circle moves calmly instead of jumping
     if (evaluation.state === "idle") {
       this.visualOffset = 0;
     } else {
       this.visualOffset = this.visualOffset * 0.78 + evaluation.offsetPercent * 0.22;
     }
 
-    // Center is 50%; clamp travel so the circle stays inside the upper guitar bout
     const clampedOffset = Math.max(-28, Math.min(28, this.visualOffset));
     circle.style.left = `calc(50% + ${clampedOffset}%)`;
   },
 
-  // Starts playing a sustained reference tone while the user holds down a string circle
   startReferenceNote(freq) {
     if (!freq) return;
     this.stopReferenceNote();
@@ -133,7 +142,6 @@ const Display = {
     overtone.type = "sine";
     overtone.frequency.setValueAtTime(freq * 2, now);
 
-    // Smooth fade-in and sustain until released
     masterGain.gain.setValueAtTime(0.001, now);
     masterGain.gain.exponentialRampToValueAtTime(0.24, now + 0.04);
 
@@ -150,7 +158,6 @@ const Display = {
     this.activeTone = { osc, overtone, masterGain };
   },
 
-  // Smoothly stops the sustained reference tone when the user lets go
   stopReferenceNote() {
     if (!this.activeTone || !this.audioCtx) return;
 
@@ -196,8 +203,20 @@ const Display = {
     link.href = lesson.url;
     link.target = "_blank";
     link.rel = "noopener noreferrer";
-    link.textContent = lesson.title;
 
+    const titleEl = document.createElement("div");
+    titleEl.className = "lesson-title";
+    titleEl.textContent = lesson.title;
+
+    const metaEl = document.createElement("div");
+    metaEl.className = "lesson-meta";
+    const instrument = lesson.instrument || "Acoustic Guitar";
+    const tuning = lesson.tuning || "Standard (E A D G B E)";
+    const capo = lesson.capo || "No Capo";
+    metaEl.textContent = `${instrument} • ${tuning} • ${capo}`;
+
+    link.appendChild(titleEl);
+    link.appendChild(metaEl);
     li.appendChild(link);
     return li;
   }

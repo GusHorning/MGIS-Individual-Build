@@ -1,5 +1,6 @@
-// STARTUP: Connects user events, live microphone audio, auto-string detection, and display
+// STARTUP: Connects user events, per-guitar saved tunings, live mic audio, and lessons
 
+let currentGuitarType = "Acoustic Guitar";
 let currentPreset = null;
 let selectedStringIndex = 0;
 
@@ -16,7 +17,6 @@ function handleStringPressStart(index) {
   const activeString = currentPreset.strings[selectedStringIndex];
   Display.startReferenceNote(activeString.freq);
 
-  // Highlight selected circle without rebuilding buttons mid-press
   document.querySelectorAll(".string-btn").forEach((btn, idx) => {
     btn.classList.toggle("selected", idx === selectedStringIndex);
   });
@@ -43,9 +43,14 @@ function handleStringPressEnd() {
   }
 }
 
-function selectPreset(presetId) {
+function selectPreset(presetId, shouldSave = true) {
   currentPreset = DataStore.presets.find((p) => p.id === presetId) || DataStore.presets[0];
   if (currentPreset) {
+    Display.setSelectedPresetValue(currentPreset.id);
+    if (shouldSave && currentGuitarType) {
+      DataStore.saveGuitarTuning(currentGuitarType, currentPreset.id);
+    }
+
     selectedStringIndex = 0;
     const firstString = currentPreset.strings[0];
     Display.renderStringButtons(
@@ -71,7 +76,6 @@ function listenLoop() {
   const rawFreq = TunerRules.detectPitch(buffer, micAudioContext.sampleRate);
 
   if (rawFreq && currentPreset) {
-    // Smooth frequency changes heavily so the tuning circle glides calmly
     if (!smoothedFreq || Math.abs(rawFreq - smoothedFreq) > 18) {
       smoothedFreq = rawFreq;
     } else {
@@ -176,7 +180,7 @@ async function initApp() {
   const presets = await DataStore.loadPresets();
   Display.renderPresetDropdown(presets);
   if (presets.length > 0) {
-    selectPreset(presets[0].id);
+    selectPreset(DataStore.getGuitarTuning(currentGuitarType), false);
   }
 
   Display.renderLessons(DataStore.lessons);
@@ -187,22 +191,25 @@ async function initApp() {
       const target = card.dataset.target;
       const guitarType = card.dataset.guitar;
       if (target === "tuner") {
+        currentGuitarType = guitarType;
         Display.setGuitarBodyShape(guitarType);
+        const savedPresetId = DataStore.getGuitarTuning(guitarType);
+        selectPreset(savedPresetId, false);
       }
       Display.showView(target, guitarType || "Song Lessons");
     });
   });
 
-  // Back to Home button (also stops mic and any held note cleanly)
+  // Back to Home button
   document.getElementById("home-btn").addEventListener("click", () => {
     if (isListening) stopMicrophone();
     Display.stopReferenceNote();
     Display.showView("home");
   });
 
-  // Preset dropdown change
+  // Preset dropdown change (saves separately for Acoustic vs. Electric)
   document.getElementById("preset-select").addEventListener("change", (e) => {
-    selectPreset(e.target.value);
+    selectPreset(e.target.value, true);
   });
 
   // Start/Stop Mic button
@@ -219,14 +226,20 @@ async function initApp() {
     e.preventDefault();
     const title = document.getElementById("lesson-title").value.trim();
     const url = document.getElementById("lesson-url").value.trim();
+    const instrument = document.getElementById("lesson-instrument").value;
+    const tuning = document.getElementById("lesson-tuning").value;
+    const capo = document.getElementById("lesson-capo").value;
     const status = document.getElementById("lesson-status").value;
 
     if (!title || !url) return;
 
-    DataStore.lessons.push({
+    DataStore.addLesson({
       id: Date.now().toString(),
       title,
       url,
+      instrument,
+      tuning,
+      capo,
       status
     });
 
