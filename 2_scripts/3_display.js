@@ -1,4 +1,4 @@
-// PRESENTATION LAYER: Updates the DOM, guitar body outline, tuner circle, sustained reference tones, and lessons
+// PRESENTATION LAYER: Updates the DOM, guitar body outline, modals, sustained reference tones, and lessons
 
 const Display = {
   audioCtx: null,
@@ -19,6 +19,52 @@ const Display = {
     } else {
       homeBtn.classList.remove("hidden");
       titleEl.textContent = customTitle || "Tune N' Teach";
+    }
+  },
+
+  openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) modal.classList.remove("hidden");
+  },
+
+  closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) modal.classList.add("hidden");
+  },
+
+  renderCustomStringSelectors(availableNotes) {
+    const grid = document.getElementById("custom-strings-grid");
+    if (!grid) return;
+    grid.innerHTML = "";
+
+    const defaultSelections = ["E2", "A2", "D3", "G3", "B3", "E4"];
+
+    for (let i = 0; i < 6; i++) {
+      const stringNumber = 6 - i;
+      const wrapper = document.createElement("div");
+      wrapper.className = "custom-string-field";
+
+      const label = document.createElement("label");
+      label.setAttribute("for", `custom-string-${stringNumber}`);
+      label.textContent = `String ${stringNumber}`;
+
+      const select = document.createElement("select");
+      select.id = `custom-string-${stringNumber}`;
+      select.className = "custom-string-select";
+
+      availableNotes.forEach((item) => {
+        const option = document.createElement("option");
+        option.value = item.note;
+        option.textContent = `${item.note} (${item.freq} Hz)`;
+        if (item.note === defaultSelections[i]) {
+          option.selected = true;
+        }
+        select.appendChild(option);
+      });
+
+      wrapper.appendChild(label);
+      wrapper.appendChild(select);
+      grid.appendChild(wrapper);
     }
   },
 
@@ -78,6 +124,7 @@ const Display = {
 
     [tunerSelect, lessonTuningSelect].forEach((select) => {
       if (!select) return;
+      const previousValue = select.value;
       select.innerHTML = "";
       presets.forEach((preset) => {
         const option = document.createElement("option");
@@ -85,6 +132,9 @@ const Display = {
         option.textContent = preset.name;
         select.appendChild(option);
       });
+      if (previousValue) {
+        select.value = previousValue;
+      }
     });
   },
 

@@ -41,6 +41,13 @@
           <p class="card-hint">Saved YouTube tutorials & progress</p>
         </button>
       </div>
+
+      <!-- Full-Width Custom Tuning Button Below Home Cards -->
+      <div class="home-bottom-action">
+        <button id="open-custom-tuning-btn" class="custom-tuning-banner-btn" type="button">
+          + Create Custom Tuning
+        </button>
+      </div>
     </section>
 
     <!-- TUNER VIEW (Guitar Body Style) -->
@@ -86,35 +93,11 @@
 
     <!-- LESSONS VIEW -->
     <section id="view-lessons" class="view">
-      <form id="lesson-form" class="lesson-form">
-        <input id="lesson-title" type="text" placeholder="Song Title (e.g., Blackbird)" required />
-        <input id="lesson-url" type="url" placeholder="YouTube URL (https://...)" required />
-        <select id="lesson-instrument" aria-label="Instrument">
-          <option value="Acoustic Guitar">Acoustic Guitar</option>
-          <option value="Electric Guitar">Electric Guitar</option>
-        </select>
-        <select id="lesson-tuning" aria-label="Tuning"></select>
-        <select id="lesson-capo" aria-label="Capo">
-          <option value="No Capo">No Capo</option>
-          <option value="Capo 1">Capo 1</option>
-          <option value="Capo 2">Capo 2</option>
-          <option value="Capo 3">Capo 3</option>
-          <option value="Capo 4">Capo 4</option>
-          <option value="Capo 5">Capo 5</option>
-          <option value="Capo 6">Capo 6</option>
-          <option value="Capo 7">Capo 7</option>
-          <option value="Capo 8">Capo 8</option>
-          <option value="Capo 9">Capo 9</option>
-          <option value="Capo 10">Capo 10</option>
-          <option value="Capo 11">Capo 11</option>
-          <option value="Capo 12">Capo 12</option>
-        </select>
-        <select id="lesson-status" aria-label="Progress List">
-          <option value="learning">Actively Learning</option>
-          <option value="known">Songs I Know</option>
-        </select>
-        <button class="primary-btn" type="submit">Add Lesson</button>
-      </form>
+      <div class="lessons-top-bar">
+        <button id="open-lesson-modal-btn" class="primary-btn lessons-add-trigger" type="button">
+          + Add Song Lesson
+        </button>
+      </div>
 
       <div class="lessons-columns">
         <div class="lesson-bucket">
@@ -128,6 +111,90 @@
       </div>
     </section>
   </main>
+
+  <!-- POPUP MODAL: CREATE CUSTOM TUNING -->
+  <div id="custom-tuning-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="custom-tuning-modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="custom-tuning-modal-title">Create Custom Tuning</h2>
+        <button id="close-custom-tuning-btn" class="modal-close-btn" type="button" aria-label="Close">✕</button>
+      </div>
+
+      <form id="custom-tuning-form" class="modal-form">
+        <label class="field-label" for="custom-tuning-name">Tuning Name</label>
+        <input id="custom-tuning-name" type="text" placeholder="e.g., Open G or DADGAD" required />
+
+        <p class="field-hint">Pick the note for each string (6th thickest string to 1st thinnest string):</p>
+        <div id="custom-strings-grid" class="custom-strings-grid"></div>
+
+        <div class="modal-actions">
+          <button id="cancel-custom-tuning-btn" class="secondary-btn" type="button">Cancel</button>
+          <button class="primary-btn" type="submit">Save Custom Tuning</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- POPUP MODAL: ADD SONG LESSON -->
+  <div id="lesson-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="lesson-modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="lesson-modal-title">Add Song Lesson</h2>
+        <button id="close-lesson-modal-btn" class="modal-close-btn" type="button" aria-label="Close">✕</button>
+      </div>
+
+      <form id="lesson-form" class="modal-form">
+        <label class="field-label" for="lesson-title">Song Title</label>
+        <input id="lesson-title" type="text" placeholder="e.g., Blackbird" required />
+
+        <label class="field-label" for="lesson-url">YouTube URL</label>
+        <input id="lesson-url" type="url" placeholder="https://www.youtube.com/watch?v=..." required />
+
+        <div class="modal-row-2">
+          <div>
+            <label class="field-label" for="lesson-instrument">Instrument</label>
+            <select id="lesson-instrument">
+              <option value="Acoustic Guitar">Acoustic Guitar</option>
+              <option value="Electric Guitar">Electric Guitar</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="field-label" for="lesson-capo">Capo</label>
+            <select id="lesson-capo">
+              <option value="No Capo">No Capo</option>
+              <option value="Capo 1">Capo 1</option>
+              <option value="Capo 2">Capo 2</option>
+              <option value="Capo 3">Capo 3</option>
+              <option value="Capo 4">Capo 4</option>
+              <option value="Capo 5">Capo 5</option>
+              <option value="Capo 6">Capo 6</option>
+              <option value="Capo 7">Capo 7</option>
+              <option value="Capo 8">Capo 8</option>
+              <option value="Capo 9">Capo 9</option>
+              <option value="Capo 10">Capo 10</option>
+              <option value="Capo 11">Capo 11</option>
+              <option value="Capo 12">Capo 12</option>
+            </select>
+          </div>
+        </div>
+
+        <label class="field-label" for="lesson-tuning">Tuning</label>
+        <select id="lesson-tuning"></select>
+
+        <label class="field-label" for="lesson-status">Progress List</label>
+        <select id="lesson-status">
+          <option value="learning">Actively Learning</option>
+          <option value="known">Songs I Know</option>
+        </select>
+
+        <div class="modal-actions">
+          <button id="cancel-lesson-modal-btn" class="secondary-btn" type="button">Cancel</button>
+          <button class="primary-btn" type="submit">Add Lesson</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- Scripts loaded in numbered order -->
   <script src="2_scripts/1_data.js"></script>
