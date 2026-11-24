@@ -1,4 +1,4 @@
-// PRESENTATION LAYER: Updates the DOM, guitar body outline, modals, sustained reference tones, and lessons
+// PRESENTATION LAYER: Updates the DOM, modals, guitar body outline, tuner circle, and sustained tones
 
 const Display = {
   audioCtx: null,
@@ -32,31 +32,28 @@ const Display = {
     if (modal) modal.classList.add("hidden");
   },
 
-  renderCustomStringSelectors(availableNotes) {
+  renderCustomStringSelectors(stringNoteOptions) {
     const grid = document.getElementById("custom-strings-grid");
     if (!grid) return;
     grid.innerHTML = "";
 
-    const defaultSelections = ["E2", "A2", "D3", "G3", "B3", "E4"];
-
-    for (let i = 0; i < 6; i++) {
-      const stringNumber = 6 - i;
+    stringNoteOptions.forEach((stringConfig) => {
       const wrapper = document.createElement("div");
       wrapper.className = "custom-string-field";
 
       const label = document.createElement("label");
-      label.setAttribute("for", `custom-string-${stringNumber}`);
-      label.textContent = `String ${stringNumber}`;
+      label.setAttribute("for", `custom-string-${stringConfig.stringNum}`);
+      label.textContent = `String ${stringConfig.stringNum}`;
 
       const select = document.createElement("select");
-      select.id = `custom-string-${stringNumber}`;
+      select.id = `custom-string-${stringConfig.stringNum}`;
       select.className = "custom-string-select";
 
-      availableNotes.forEach((item) => {
+      stringConfig.notes.forEach((item) => {
         const option = document.createElement("option");
         option.value = item.note;
-        option.textContent = `${item.note} (${item.freq} Hz)`;
-        if (item.note === defaultSelections[i]) {
+        option.textContent = item.note;
+        if (item.note === stringConfig.defaultNote) {
           option.selected = true;
         }
         select.appendChild(option);
@@ -65,7 +62,7 @@ const Display = {
       wrapper.appendChild(label);
       wrapper.appendChild(select);
       grid.appendChild(wrapper);
-    }
+    });
   },
 
   setGuitarBodyShape(guitarType) {
@@ -93,11 +90,13 @@ const Display = {
     const container = document.getElementById("string-buttons");
     container.innerHTML = "";
     strings.forEach((str, idx) => {
+      // Strip any legacy octave numbers so old saved presets also show clean letters like "D"
+      const cleanNote = str.note.replace(/[0-9]/g, "");
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = `string-btn ${idx === selectedIndex ? "selected" : ""}`;
-      btn.textContent = str.note;
-      btn.title = `Press and hold to hear ${str.note} (${str.freq} Hz)`;
+      btn.textContent = cleanNote;
+      btn.title = `Press and hold to hear ${cleanNote}`;
 
       btn.addEventListener("pointerdown", (e) => {
         e.preventDefault();
@@ -122,31 +121,46 @@ const Display = {
     const tunerSelect = document.getElementById("preset-select");
     const lessonTuningSelect = document.getElementById("lesson-tuning");
 
-    [tunerSelect, lessonTuningSelect].forEach((select) => {
-      if (!select) return;
-      const previousValue = select.value;
-      select.innerHTML = "";
+    const currentTunerVal = tunerSelect ? tunerSelect.value : "";
+    const currentLessonVal = lessonTuningSelect ? lessonTuningSelect.value : "";
+
+    if (tunerSelect) {
+      tunerSelect.innerHTML = "";
       presets.forEach((preset) => {
         const option = document.createElement("option");
-        option.value = select === lessonTuningSelect ? preset.name : preset.id;
+        option.value = preset.id;
         option.textContent = preset.name;
-        select.appendChild(option);
+        tunerSelect.appendChild(option);
       });
-      if (previousValue) {
-        select.value = previousValue;
+      if (currentTunerVal && presets.some((p) => p.id === currentTunerVal)) {
+        tunerSelect.value = currentTunerVal;
       }
-    });
+    }
+
+    if (lessonTuningSelect) {
+      lessonTuningSelect.innerHTML = "";
+      presets.forEach((preset) => {
+        const option = document.createElement("option");
+        option.value = preset.name;
+        option.textContent = preset.name;
+        lessonTuningSelect.appendChild(option);
+      });
+      if (currentLessonVal && presets.some((p) => p.name === currentLessonVal)) {
+        lessonTuningSelect.value = currentLessonVal;
+      }
+    }
   },
 
   setSelectedPresetValue(presetId) {
     const select = document.getElementById("preset-select");
-    if (select) {
+    if (select && presetId) {
       select.value = presetId;
     }
   },
 
   updateTunerMeter(targetNote, targetFreq, detectedFreq, evaluation) {
-    document.getElementById("target-note-display").textContent = targetNote || "--";
+    const cleanTargetNote = targetNote ? targetNote.replace(/[0-9]/g, "") : "--";
+    document.getElementById("target-note-display").textContent = cleanTargetNote;
     document.getElementById("target-freq").textContent = targetFreq ? targetFreq.toFixed(1) : "--";
     document.getElementById("detected-freq").textContent = detectedFreq ? detectedFreq.toFixed(1) : "--";
     document.getElementById("status-text").textContent = evaluation.label;
@@ -223,7 +237,7 @@ const Display = {
     overtone.stop(now + 0.14);
   },
 
-  renderLessons(lessons) {
+  renderLessons(lessons, onEditLesson) {
     const learningList = document.getElementById("list-learning");
     const knownList = document.getElementById("list-known");
     learningList.innerHTML = "";
@@ -235,17 +249,17 @@ const Display = {
     if (learningItems.length === 0) {
       learningList.innerHTML = `<li class="empty-msg">No lessons added yet.</li>`;
     } else {
-      learningItems.forEach((lesson) => learningList.appendChild(this.createLessonItem(lesson)));
+      learningItems.forEach((lesson) => learningList.appendChild(this.createLessonItem(lesson, onEditLesson)));
     }
 
     if (knownItems.length === 0) {
       knownList.innerHTML = `<li class="empty-msg">No songs added yet.</li>`;
     } else {
-      knownItems.forEach((lesson) => knownList.appendChild(this.createLessonItem(lesson)));
+      knownItems.forEach((lesson) => knownList.appendChild(this.createLessonItem(lesson, onEditLesson)));
     }
   },
 
-  createLessonItem(lesson) {
+  createLessonItem(lesson, onEditLesson) {
     const li = document.createElement("li");
     li.className = "lesson-item";
 
@@ -267,7 +281,18 @@ const Display = {
 
     link.appendChild(titleEl);
     link.appendChild(metaEl);
+
+    const editBtn = document.createElement("button");
+    editBtn.type = "button";
+    editBtn.className = "lesson-edit-btn";
+    editBtn.textContent = "Edit";
+    editBtn.title = `Edit or delete ${lesson.title}`;
+    editBtn.addEventListener("click", () => {
+      if (onEditLesson) onEditLesson(lesson);
+    });
+
     li.appendChild(link);
+    li.appendChild(editBtn);
     return li;
   }
 };

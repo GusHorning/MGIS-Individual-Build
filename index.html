@@ -124,7 +124,7 @@
         <label class="field-label" for="custom-tuning-name">Tuning Name</label>
         <input id="custom-tuning-name" type="text" placeholder="e.g., Open G or DADGAD" required />
 
-        <p class="field-hint">Pick the note for each string (6th thickest string to 1st thinnest string):</p>
+        <p class="field-hint">Choose the note for each string (left = thickest string 6, right = thinnest string 1):</p>
         <div id="custom-strings-grid" class="custom-strings-grid"></div>
 
         <div class="modal-actions">
@@ -169,12 +169,6 @@
               <option value="Capo 4">Capo 4</option>
               <option value="Capo 5">Capo 5</option>
               <option value="Capo 6">Capo 6</option>
-              <option value="Capo 7">Capo 7</option>
-              <option value="Capo 8">Capo 8</option>
-              <option value="Capo 9">Capo 9</option>
-              <option value="Capo 10">Capo 10</option>
-              <option value="Capo 11">Capo 11</option>
-              <option value="Capo 12">Capo 12</option>
             </select>
           </div>
         </div>
@@ -188,9 +182,12 @@
           <option value="known">Songs I Know</option>
         </select>
 
-        <div class="modal-actions">
-          <button id="cancel-lesson-modal-btn" class="secondary-btn" type="button">Cancel</button>
-          <button class="primary-btn" type="submit">Add Lesson</button>
+        <div class="modal-actions modal-actions-split">
+          <button id="delete-lesson-btn" class="danger-btn hidden" type="button">Delete Song</button>
+          <div class="modal-actions-right">
+            <button id="cancel-lesson-modal-btn" class="secondary-btn" type="button">Cancel</button>
+            <button id="save-lesson-submit-btn" class="primary-btn" type="submit">Add Lesson</button>
+          </div>
         </div>
       </form>
     </div>

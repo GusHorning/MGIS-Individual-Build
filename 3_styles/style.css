@@ -74,13 +74,13 @@ body {
   overflow: hidden;
   color: #fff;
   cursor: pointer;
-  user-select: none;
-  -webkit-user-select: none;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding-bottom: 1rem;
   min-height: 385px;
+  user-select: none;
+  -webkit-user-select: none;
   transition: transform 0.15s ease, border-color 0.15s ease;
 }
 
@@ -91,7 +91,7 @@ body {
 
 .choice-card img {
   width: 100%;
-  height: 320px;
+  height: 325px;
   object-fit: cover;
   object-position: center;
   background-color: #16181d;
@@ -109,7 +109,7 @@ body {
 }
 
 .lessons-icon {
-  font-size: 3rem;
+  font-size: 2.85rem;
   color: #eab308;
   margin-bottom: 0.85rem;
 }
@@ -132,21 +132,22 @@ body {
 
 .custom-tuning-banner-btn {
   width: 100%;
-  padding: 1.15rem 1.5rem;
   background: #1c1f24;
   color: #eab308;
   border: 2px solid #2c313a;
   border-radius: 12px;
-  font-size: 1.1rem;
+  padding: 1.15rem 1.5rem;
+  font-size: 1.15rem;
   font-weight: 700;
   cursor: pointer;
-  transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+  letter-spacing: 0.01em;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 }
 
 .custom-tuning-banner-btn:hover {
-  transform: translateY(-2px);
+  background: #242830;
   border-color: #eab308;
-  background: #232730;
+  transform: translateY(-2px);
 }
 
 /* Tuner Controls */
@@ -167,6 +168,11 @@ input {
   padding: 0.6rem 0.75rem;
   border-radius: 6px;
   font-size: 0.95rem;
+  width: 100%;
+}
+
+.tuner-controls select {
+  width: auto;
 }
 
 .primary-btn {
@@ -197,6 +203,10 @@ input {
   padding: 0.65rem 1.1rem;
   border-radius: 6px;
   cursor: pointer;
+}
+
+.secondary-btn:hover {
+  background: #3a404c;
 }
 
 .status-text {
@@ -260,8 +270,8 @@ input {
 .target-zone {
   position: relative;
   z-index: 2;
-  width: 46%;
-  height: 116px;
+  width: 42%;
+  height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -281,13 +291,13 @@ input {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 98px;
-  height: 98px;
+  width: 102px;
+  height: 102px;
   border-radius: 50%;
   background: #2c313a;
   border: 4px solid #9ca3af;
   color: #f4f4f6;
-  font-size: 1.85rem;
+  font-size: 1.9rem;
   font-weight: 800;
   display: flex;
   align-items: center;
@@ -312,18 +322,23 @@ input {
   box-shadow: 0 0 26px rgba(34, 197, 94, 0.85);
 }
 
-/* Flat / Hz / Sharp Row */
+/* Flat / Hz / Sharp Row Tucked Inside Waist */
 .meter-labels {
   position: relative;
   z-index: 2;
-  width: 39%;
+  width: 44%;
   margin-top: 0.45rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   color: #a8b0bd;
   white-space: nowrap;
+}
+
+.guitar-body.electric .meter-labels {
+  width: 38%;
+  font-size: 0.76rem;
 }
 
 .freq-readout {
@@ -331,11 +346,11 @@ input {
   color: #d1d5db;
 }
 
-/* 6 Note Circles */
+/* 6 Note Circles Raised Into the Wide Belly of Both Guitars */
 .string-row {
   position: relative;
   z-index: 2;
-  width: 64%;
+  width: 66%;
   margin-top: auto;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -351,7 +366,7 @@ input {
   width: 100%;
   aspect-ratio: 1 / 1;
   font-weight: 800;
-  font-size: 1rem;
+  font-size: 1.05rem;
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
@@ -388,32 +403,37 @@ input {
   }
 
   .target-zone {
-    width: 50%;
-    height: 94px;
+    width: 48%;
+    height: 98px;
   }
 
   .tuning-circle {
-    width: 80px;
-    height: 80px;
-    font-size: 1.45rem;
+    width: 82px;
+    height: 82px;
+    font-size: 1.5rem;
   }
 
   .meter-labels {
-    width: 45%;
+    width: 50%;
     font-size: 0.72rem;
   }
 
+  .guitar-body.electric .meter-labels {
+    width: 42%;
+    font-size: 0.68rem;
+  }
+
   .string-row {
-    width: 70%;
+    width: 72%;
     gap: 0.3rem;
   }
 
   .string-btn {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
   }
 }
 
-/* Lessons Section (Clean Top Button + Buckets) */
+/* Lessons Section */
 .lessons-top-bar {
   display: flex;
   justify-content: center;
@@ -421,8 +441,9 @@ input {
 }
 
 .lessons-add-trigger {
-  font-size: 1rem;
-  padding: 0.8rem 1.6rem;
+  padding: 0.8rem 1.75rem;
+  font-size: 1.05rem;
+  border-radius: 10px;
 }
 
 .lessons-columns {
@@ -457,17 +478,25 @@ input {
   font-style: italic;
 }
 
-.lesson-item a {
-  display: block;
-  padding: 0.7rem 0.85rem;
+.lesson-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
   background: #262a31;
   border-radius: 8px;
-  color: #f4f4f6;
-  text-decoration: none;
+  padding: 0.65rem 0.75rem;
 }
 
-.lesson-item a:hover {
+.lesson-item:hover {
   background: #323741;
+}
+
+.lesson-item a {
+  flex: 1;
+  min-width: 0;
+  color: #f4f4f6;
+  text-decoration: none;
 }
 
 .lesson-title {
@@ -484,11 +513,28 @@ input {
   color: #a8b0bd;
 }
 
-/* Popup Modals (Custom Tuning & Add Song Lesson) */
+.lesson-edit-btn {
+  background: transparent;
+  border: 1px solid #3f4654;
+  color: #a8b0bd;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.lesson-edit-btn:hover {
+  border-color: #eab308;
+  color: #eab308;
+}
+
+/* Popup Modals (Custom Tuning & Add/Edit Song Lesson) */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(8, 10, 13, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -501,9 +547,9 @@ input {
   border: 1px solid #2c313a;
   border-radius: 14px;
   width: 100%;
-  max-width: 480px;
+  max-width: 500px;
   padding: 1.35rem;
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.65);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7);
 }
 
 .modal-header {
@@ -524,7 +570,7 @@ input {
   color: #a8b0bd;
   font-size: 1.2rem;
   cursor: pointer;
-  padding: 0.25rem 0.45rem;
+  padding: 0.2rem 0.45rem;
 }
 
 .modal-close-btn:hover {
@@ -535,11 +581,6 @@ input {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-}
-
-.modal-form input,
-.modal-form select {
-  width: 100%;
 }
 
 .field-label {
@@ -570,22 +611,37 @@ input {
   margin-bottom: 0;
 }
 
+/* Clean 6-Column String Row (String 6 to String 1, Left to Right) */
 .custom-strings-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.65rem;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.45rem;
 }
 
 .custom-string-field {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .custom-string-field label {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #a8b0bd;
   font-weight: 600;
+  white-space: nowrap;
+}
+
+.custom-string-select {
+  text-align: center;
+  padding: 0.55rem 0.25rem;
+  font-weight: 700;
+}
+
+@media (max-width: 480px) {
+  .custom-strings-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .modal-actions {
@@ -593,4 +649,30 @@ input {
   justify-content: flex-end;
   gap: 0.65rem;
   margin-top: 0.5rem;
+}
+
+.modal-actions-split {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-actions-right {
+  display: flex;
+  gap: 0.65rem;
+  margin-left: auto;
+}
+
+.danger-btn {
+  background: rgba(239, 68, 68, 0.14);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  font-weight: 600;
+  padding: 0.6rem 0.95rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.danger-btn:hover {
+  background: #ef4444;
+  color: #fff;
 }
