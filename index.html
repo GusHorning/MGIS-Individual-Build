@@ -6,7 +6,7 @@
   <title>Tune N' Teach</title>
   <link rel="stylesheet" href="3_styles/style.css" />
 </head>
-<body>
+<body class="theme-home">
   <header class="top-bar">
     <button id="home-btn" class="nav-btn hidden" type="button">← Home</button>
     <h1 id="page-title">Tune N' Teach</h1>
@@ -17,35 +17,39 @@
     <section id="view-home" class="view active">
       <p class="subtitle">Choose your instrument or jump into your lessons.</p>
       <div class="card-grid">
-        <button class="choice-card" data-target="tuner" data-guitar="Acoustic Guitar" type="button">
-          <img
-            src="4_images/chris-hardy-VY0XY_DNwqc-unsplash.jpg"
-            alt="Acoustic Guitar"
-            draggable="false"
-          />
+        <button class="choice-card acoustic-card" data-target="tuner" data-guitar="Acoustic Guitar" type="button">
+          <div class="card-media">
+            <img
+              src="4_images/chris-hardy-VY0XY_DNwqc-unsplash.jpg"
+              alt="Acoustic Guitar"
+              draggable="false"
+            />
+          </div>
           <div class="card-label">Acoustic Guitar</div>
         </button>
 
-        <button class="choice-card" data-target="tuner" data-guitar="Electric Guitar" type="button">
-          <img
-            src="4_images/krzysztof-hepner-ZIGI-0Br8Bg-unsplash.jpg"
-            alt="Electric Guitar"
-            draggable="false"
-          />
+        <button class="choice-card electric-card" data-target="tuner" data-guitar="Electric Guitar" type="button">
+          <div class="card-media">
+            <img
+              src="4_images/krzysztof-hepner-ZIGI-0Br8Bg-unsplash.jpg"
+              alt="Electric Guitar"
+              draggable="false"
+            />
+          </div>
           <div class="card-label">Electric Guitar</div>
         </button>
 
         <button class="choice-card lessons-card" data-target="lessons" type="button">
           <div class="lessons-icon">▶</div>
           <div class="card-label">Song Lessons</div>
-          <p class="card-hint">Saved YouTube tutorials & progress</p>
+          <p class="card-hint">Saved tutorials and known songs</p>
         </button>
       </div>
 
-      <!-- Full-Width Custom Tuning Button Below Home Cards -->
+      <!-- Full-Width Custom Tunings Button Below Home Cards -->
       <div class="home-bottom-action">
-        <button id="open-custom-tuning-btn" class="custom-tuning-banner-btn" type="button">
-          + Create Custom Tuning
+        <button class="choice-card custom-tuning-banner-btn" data-target="custom-tunings" type="button">
+          Custom Tunings
         </button>
       </div>
     </section>
@@ -62,14 +66,36 @@
 
       <!-- Guitar Body Container -->
       <div id="guitar-body-frame" class="guitar-body acoustic">
-        <!-- Traditional Dreadnought Acoustic Guitar Body Outline -->
+        <!-- Traditional Dreadnought Acoustic Guitar Body with Rosette Ring -->
         <svg class="body-svg acoustic-svg" viewBox="0 0 500 540" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M 198,10 L 302,10 C 318,22 396,38 418,104 C 434,152 406,196 392,226 C 380,252 386,272 426,314 C 474,366 478,468 408,510 C 356,536 144,536 92,510 C 22,468 26,366 74,314 C 114,272 120,252 108,226 C 94,196 66,152 82,104 C 104,38 182,22 198,10 Z" />
+          <defs>
+            <radialGradient id="acoustic-wood-grad" cx="50%" cy="46%" r="58%">
+              <stop offset="0%" stop-color="#4e2e18" />
+              <stop offset="68%" stop-color="#311c0f" />
+              <stop offset="100%" stop-color="#1d1008" />
+            </radialGradient>
+          </defs>
+          <path class="guitar-shell" d="M 198,10 L 302,10 C 318,22 396,38 418,104 C 434,152 406,196 392,226 C 380,252 386,272 426,314 C 474,366 478,468 408,510 C 356,536 144,536 92,510 C 22,468 26,366 74,314 C 114,272 120,252 108,226 C 94,196 66,152 82,104 C 104,38 182,22 198,10 Z" />
+          <path class="guitar-purfling" d="M 202,20 L 298,20 C 313,31 387,46 408,108 C 423,153 396,195 383,223 C 371,249 377,270 415,310 C 461,359 464,456 399,496 C 350,520 150,520 101,496 C 36,456 39,359 85,310 C 123,270 129,249 117,223 C 104,195 77,153 92,108 C 113,46 187,31 202,20 Z" />
+          <circle class="acoustic-rosette-outer" cx="250" cy="242" r="82" />
+          <circle class="acoustic-rosette-inner" cx="250" cy="242" r="68" />
         </svg>
 
-        <!-- Fender Stratocaster Electric Guitar Body Outline -->
+        <!-- Fender Stratocaster Electric Guitar Body with Sunburst & Pickguard Contour -->
         <svg class="body-svg electric-svg" viewBox="0 0 500 540" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M 208,10 L 292,10 L 292,98 C 304,104 316,96 326,80 C 338,60 356,56 368,68 C 382,82 374,124 358,158 C 344,188 346,218 378,256 C 422,308 446,388 412,456 C 384,510 318,530 250,524 C 218,522 196,532 162,530 C 104,526 56,478 52,414 C 48,348 86,296 122,250 C 148,216 148,180 128,136 C 104,84 96,34 118,24 C 138,16 158,48 176,82 C 186,100 198,104 208,98 Z" />
+          <defs>
+            <radialGradient id="strat-sunburst-grad" cx="48%" cy="54%" r="56%">
+              <stop offset="0%" stop-color="#c26319" />
+              <stop offset="52%" stop-color="#6e290f" />
+              <stop offset="85%" stop-color="#2b1209" />
+              <stop offset="100%" stop-color="#180a05" />
+            </radialGradient>
+          </defs>
+          <path class="guitar-shell" d="M 208,10 L 292,10 L 292,98 C 304,104 316,96 326,80 C 338,60 356,56 368,68 C 382,82 374,124 358,158 C 344,188 346,218 378,256 C 422,308 446,388 412,456 C 384,510 318,530 250,524 C 218,522 196,532 162,530 C 104,526 56,478 52,414 C 48,348 86,296 122,250 C 148,216 148,180 128,136 C 104,84 96,34 118,24 C 138,16 158,48 176,82 C 186,100 198,104 208,98 Z" />
+          <path class="strat-pickguard" d="M 214,124 L 286,124 C 296,154 314,190 326,232 C 338,274 328,318 292,340 C 262,358 214,358 178,340 C 144,322 134,282 152,240 C 168,202 192,160 214,124 Z" />
+          <rect class="strat-pickup" x="210" y="216" width="80" height="16" rx="8" />
+          <rect class="strat-pickup" x="210" y="256" width="80" height="16" rx="8" />
+          <rect class="strat-pickup" x="208" y="296" width="84" height="16" rx="8" transform="rotate(-8 250 304)" />
         </svg>
 
         <!-- Top Target Note Zone -->
@@ -110,9 +136,25 @@
         </div>
       </div>
     </section>
+
+    <!-- CUSTOM TUNINGS VIEW -->
+    <section id="view-custom-tunings" class="view">
+      <div class="lessons-top-bar">
+        <button id="open-custom-tuning-btn" class="primary-btn lessons-add-trigger" type="button">
+          + Create Custom Tuning
+        </button>
+      </div>
+
+      <div class="custom-tunings-container">
+        <div class="lesson-bucket">
+          <h2>My Custom Tunings</h2>
+          <ul id="list-custom-tunings" class="lesson-list"></ul>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <!-- POPUP MODAL: CREATE CUSTOM TUNING -->
+  <!-- POPUP MODAL: CREATE / EDIT CUSTOM TUNING -->
   <div id="custom-tuning-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="custom-tuning-modal-title">
     <div class="modal-card">
       <div class="modal-header">
@@ -127,15 +169,18 @@
         <p class="field-hint">Choose the note for each string (left = thickest string 6, right = thinnest string 1):</p>
         <div id="custom-strings-grid" class="custom-strings-grid"></div>
 
-        <div class="modal-actions">
-          <button id="cancel-custom-tuning-btn" class="secondary-btn" type="button">Cancel</button>
-          <button class="primary-btn" type="submit">Save Custom Tuning</button>
+        <div class="modal-actions modal-actions-split">
+          <button id="delete-custom-tuning-btn" class="danger-btn hidden" type="button">Delete Tuning</button>
+          <div class="modal-actions-right">
+            <button id="cancel-custom-tuning-btn" class="secondary-btn" type="button">Cancel</button>
+            <button id="save-custom-tuning-submit-btn" class="primary-btn" type="submit">Save Custom Tuning</button>
+          </div>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- POPUP MODAL: ADD SONG LESSON -->
+  <!-- POPUP MODAL: ADD / EDIT SONG LESSON -->
   <div id="lesson-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="lesson-modal-title">
     <div class="modal-card">
       <div class="modal-header">

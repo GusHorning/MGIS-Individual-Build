@@ -1,6 +1,7 @@
-// DATA LAYER: Loads tuning presets, saves custom tunings, remembers per-guitar tunings, and persists lessons
+// DATA LAYER: Loads tuning presets, saves/edits/deletes custom tunings, remembers per-guitar tunings, and persists lessons
 
 const DataStore = {
+  basePresets: [],
   presets: [],
   customPresets: [],
   lessons: [],
@@ -156,27 +157,39 @@ const DataStore = {
     }
   },
 
+  rebuildPresetsList() {
+    this.presets = [...this.basePresets, ...this.customPresets];
+  },
+
+  saveCustomPresetsToStorage() {
+    try {
+      localStorage.setItem(this.STORAGE_KEYS.CUSTOM_PRESETS, JSON.stringify(this.customPresets));
+    } catch (err) {
+      // Ignore storage errors
+    }
+  },
+
   async loadPresets() {
     this.loadSavedState();
-    let basePresets = this.defaultPresets();
+    this.basePresets = this.defaultPresets();
 
     try {
       const response = await fetch("1_data/tunings.json", { cache: "no-store" });
       if (!response.ok) throw new Error("Could not load tunings.json");
       const data = await response.json();
       if (data.presets && data.presets.length > 0) {
-        basePresets = data.presets;
+        this.basePresets = data.presets;
       }
     } catch (err) {
       // Fallback when opened directly from file:// instead of a web server
     }
 
-    this.presets = [...basePresets, ...this.customPresets];
+    this.rebuildPresetsList();
     return this.presets;
   },
 
-  addCustomPreset(customName, selectedNoteLetters) {
-    const strings = selectedNoteLetters.map((noteLetter, idx) => {
+  buildStringsFromNotes(selectedNoteLetters) {
+    return selectedNoteLetters.map((noteLetter, idx) => {
       const stringConfig = this.stringNoteOptions[idx];
       const match = stringConfig.notes.find((n) => n.note === noteLetter) || stringConfig.notes[0];
       return {
@@ -185,31 +198,66 @@ const DataStore = {
         freq: match.freq
       };
     });
+  },
 
+  addCustomPreset(customName, selectedNoteLetters) {
+    const strings = this.buildStringsFromNotes(selectedNoteLetters);
     const lettersSummary = strings.map((s) => s.note).join(" ");
-    const cleanName = customName.trim();
-    const displayName = `${cleanName} (${lettersSummary})`;
+    const cleanTitle = customName.trim();
+    const displayName = `${cleanTitle} (${lettersSummary})`;
 
     const newPreset = {
       id: `custom-${Date.now()}`,
+      title: cleanTitle,
       name: displayName,
       strings
     };
 
     this.customPresets.push(newPreset);
-    this.presets.push(newPreset);
-
-    try {
-      localStorage.setItem(this.STORAGE_KEYS.CUSTOM_PRESETS, JSON.stringify(this.customPresets));
-    } catch (err) {
-      // Ignore storage errors
-    }
-
+    this.rebuildPresetsList();
+    this.saveCustomPresetsToStorage();
     return newPreset;
   },
 
+  updateCustomPreset(presetId, customName, selectedNoteLetters) {
+    const index = this.customPresets.findIndex((p) => p.id === presetId);
+    if (index === -1) return null;
+
+    const strings = this.buildStringsFromNotes(selectedNoteLetters);
+    const lettersSummary = strings.map((s) => s.note).join(" ");
+    const cleanTitle = customName.trim();
+    const displayName = `${cleanTitle} (${lettersSummary})`;
+
+    const updatedPreset = {
+      ...this.customPresets[index],
+      title: cleanTitle,
+      name: displayName,
+      strings
+    };
+
+    this.customPresets[index] = updatedPreset;
+    this.rebuildPresetsList();
+    this.saveCustomPresetsToStorage();
+    return updatedPreset;
+  },
+
+  deleteCustomPreset(presetId) {
+    this.customPresets = this.customPresets.filter((p) => p.id !== presetId);
+    this.rebuildPresetsList();
+    this.saveCustomPresetsToStorage();
+
+    // Fall back to Standard if either guitar had this deleted custom tuning active
+    Object.keys(this.guitarTunings).forEach((guitarType) => {
+      if (this.guitarTunings[guitarType] === presetId) {
+        this.saveGuitarTuning(guitarType, "standard");
+      }
+    });
+  },
+
   getGuitarTuning(guitarType) {
-    return this.guitarTunings[guitarType] || "standard";
+    const savedId = this.guitarTunings[guitarType] || "standard";
+    const exists = this.presets.some((p) => p.id === savedId);
+    return exists ? savedId : "standard";
   },
 
   saveGuitarTuning(guitarType, presetId) {

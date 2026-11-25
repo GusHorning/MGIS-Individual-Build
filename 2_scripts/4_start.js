@@ -1,9 +1,10 @@
-// STARTUP: Connects user events, custom tuning creation, per-guitar saved tunings, live mic, and lessons
+// STARTUP: Connects user events, custom tuning creation/editing, per-guitar saved tunings, live mic, and lessons
 
 let currentGuitarType = "Acoustic Guitar";
 let currentPreset = null;
 let selectedStringIndex = 0;
 let editingLessonId = null;
+let editingCustomPresetId = null;
 
 // Microphone state
 let micAudioContext = null;
@@ -178,6 +179,32 @@ function stopMicrophone() {
   }
 }
 
+function openCreateCustomTuningModal() {
+  editingCustomPresetId = null;
+  document.getElementById("custom-tuning-modal-title").textContent = "Create Custom Tuning";
+  document.getElementById("save-custom-tuning-submit-btn").textContent = "Save Custom Tuning";
+  document.getElementById("delete-custom-tuning-btn").classList.add("hidden");
+
+  document.getElementById("custom-tuning-form").reset();
+  Display.renderCustomStringSelectors(DataStore.stringNoteOptions);
+  Display.openModal("custom-tuning-modal");
+}
+
+function openEditCustomTuningModal(preset) {
+  editingCustomPresetId = preset.id;
+  document.getElementById("custom-tuning-modal-title").textContent = "Edit Custom Tuning";
+  document.getElementById("save-custom-tuning-submit-btn").textContent = "Save Changes";
+  document.getElementById("delete-custom-tuning-btn").classList.remove("hidden");
+
+  document.getElementById("custom-tuning-name").value = preset.title || preset.name.split(" (")[0];
+  Display.renderCustomStringSelectors(DataStore.stringNoteOptions, preset.strings);
+  Display.openModal("custom-tuning-modal");
+}
+
+function refreshCustomTuningsList() {
+  Display.renderCustomTuningsList(DataStore.customPresets, openEditCustomTuningModal);
+}
+
 function openAddLessonModal() {
   editingLessonId = null;
   document.getElementById("lesson-modal-title").textContent = "Add Song Lesson";
@@ -214,12 +241,10 @@ function wireModalControls() {
   const openCustomBtn = document.getElementById("open-custom-tuning-btn");
   const closeCustomBtn = document.getElementById("close-custom-tuning-btn");
   const cancelCustomBtn = document.getElementById("cancel-custom-tuning-btn");
+  const deleteCustomBtn = document.getElementById("delete-custom-tuning-btn");
   const customModal = document.getElementById("custom-tuning-modal");
 
-  openCustomBtn.addEventListener("click", () => {
-    Display.renderCustomStringSelectors(DataStore.stringNoteOptions);
-    Display.openModal("custom-tuning-modal");
-  });
+  openCustomBtn.addEventListener("click", openCreateCustomTuningModal);
 
   [closeCustomBtn, cancelCustomBtn].forEach((btn) => {
     btn.addEventListener("click", () => Display.closeModal("custom-tuning-modal"));
@@ -227,6 +252,17 @@ function wireModalControls() {
 
   customModal.addEventListener("click", (e) => {
     if (e.target === customModal) Display.closeModal("custom-tuning-modal");
+  });
+
+  deleteCustomBtn.addEventListener("click", () => {
+    if (!editingCustomPresetId) return;
+    DataStore.deleteCustomPreset(editingCustomPresetId);
+    editingCustomPresetId = null;
+
+    Display.renderPresetDropdown(DataStore.presets);
+    selectPreset(DataStore.getGuitarTuning(currentGuitarType), false);
+    refreshCustomTuningsList();
+    Display.closeModal("custom-tuning-modal");
   });
 
   const openLessonBtn = document.getElementById("open-lesson-modal-btn");
@@ -264,6 +300,7 @@ async function initApp() {
   }
 
   refreshLessonsList();
+  refreshCustomTuningsList();
   wireModalControls();
 
   document.querySelectorAll(".choice-card").forEach((card) => {
@@ -275,8 +312,13 @@ async function initApp() {
         Display.setGuitarBodyShape(guitarType);
         const savedPresetId = DataStore.getGuitarTuning(guitarType);
         selectPreset(savedPresetId, false);
+        Display.showView(target, guitarType);
+      } else if (target === "custom-tunings") {
+        refreshCustomTuningsList();
+        Display.showView(target, "Custom Tunings");
+      } else {
+        Display.showView(target, "Song Lessons");
       }
-      Display.showView(target, guitarType || "Song Lessons");
     });
   });
 
@@ -310,10 +352,18 @@ async function initApp() {
       selectedNotes.push(select ? select.value : "E");
     }
 
-    const newPreset = DataStore.addCustomPreset(tuningName, selectedNotes);
-    Display.renderPresetDropdown(DataStore.presets);
-    selectPreset(newPreset.id, false);
+    if (editingCustomPresetId) {
+      DataStore.updateCustomPreset(editingCustomPresetId, tuningName, selectedNotes);
+      editingCustomPresetId = null;
+      Display.renderPresetDropdown(DataStore.presets);
+      selectPreset(DataStore.getGuitarTuning(currentGuitarType), false);
+    } else {
+      const newPreset = DataStore.addCustomPreset(tuningName, selectedNotes);
+      Display.renderPresetDropdown(DataStore.presets);
+      selectPreset(newPreset.id, false);
+    }
 
+    refreshCustomTuningsList();
     e.target.reset();
     Display.closeModal("custom-tuning-modal");
   });

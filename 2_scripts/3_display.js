@@ -1,9 +1,14 @@
-// PRESENTATION LAYER: Updates the DOM, modals, guitar body outline, tuner circle, and sustained tones
+// PRESENTATION LAYER: Updates the DOM, room themes, modals, custom tunings list, guitar body outline, and sustained tones
 
 const Display = {
   audioCtx: null,
   activeTone: null,
   visualOffset: 0,
+
+  applyRoomTheme(themeClass) {
+    document.body.classList.remove("theme-home", "theme-acoustic", "theme-electric", "theme-lessons");
+    document.body.classList.add(themeClass);
+  },
 
   showView(viewName, customTitle) {
     document.querySelectorAll(".view").forEach((el) => el.classList.remove("active"));
@@ -16,6 +21,15 @@ const Display = {
     if (viewName === "home") {
       homeBtn.classList.add("hidden");
       titleEl.textContent = "Tune N' Teach";
+      this.applyRoomTheme("theme-home");
+    } else if (viewName === "lessons") {
+      homeBtn.classList.remove("hidden");
+      titleEl.textContent = customTitle || "Song Lessons";
+      this.applyRoomTheme("theme-lessons");
+    } else if (viewName === "custom-tunings") {
+      homeBtn.classList.remove("hidden");
+      titleEl.textContent = customTitle || "Custom Tunings";
+      this.applyRoomTheme("theme-home");
     } else {
       homeBtn.classList.remove("hidden");
       titleEl.textContent = customTitle || "Tune N' Teach";
@@ -32,12 +46,12 @@ const Display = {
     if (modal) modal.classList.add("hidden");
   },
 
-  renderCustomStringSelectors(stringNoteOptions) {
+  renderCustomStringSelectors(stringNoteOptions, existingStrings = null) {
     const grid = document.getElementById("custom-strings-grid");
     if (!grid) return;
     grid.innerHTML = "";
 
-    stringNoteOptions.forEach((stringConfig) => {
+    stringNoteOptions.forEach((stringConfig, idx) => {
       const wrapper = document.createElement("div");
       wrapper.className = "custom-string-field";
 
@@ -49,11 +63,15 @@ const Display = {
       select.id = `custom-string-${stringConfig.stringNum}`;
       select.className = "custom-string-select";
 
+      const targetNote = existingStrings && existingStrings[idx]
+        ? existingStrings[idx].note.replace(/[0-9]/g, "")
+        : stringConfig.defaultNote;
+
       stringConfig.notes.forEach((item) => {
         const option = document.createElement("option");
         option.value = item.note;
         option.textContent = item.note;
-        if (item.note === stringConfig.defaultNote) {
+        if (item.note === targetNote) {
           option.selected = true;
         }
         select.appendChild(option);
@@ -65,13 +83,59 @@ const Display = {
     });
   },
 
+  renderCustomTuningsList(customPresets, onEditCustomPreset) {
+    const list = document.getElementById("list-custom-tunings");
+    if (!list) return;
+    list.innerHTML = "";
+
+    if (customPresets.length === 0) {
+      list.innerHTML = `<li class="empty-msg">No custom tunings created yet.</li>`;
+      return;
+    }
+
+    customPresets.forEach((preset) => {
+      const li = document.createElement("li");
+      li.className = "lesson-item";
+
+      const info = document.createElement("div");
+      info.className = "custom-tuning-info";
+
+      const titleEl = document.createElement("div");
+      titleEl.className = "lesson-title";
+      titleEl.textContent = preset.title || preset.name.split(" (")[0];
+
+      const metaEl = document.createElement("div");
+      metaEl.className = "lesson-meta";
+      const notesRow = preset.strings.map((s) => s.note.replace(/[0-9]/g, "")).join(" • ");
+      metaEl.textContent = `Strings 6–1: ${notesRow}`;
+
+      info.appendChild(titleEl);
+      info.appendChild(metaEl);
+
+      const editBtn = document.createElement("button");
+      editBtn.type = "button";
+      editBtn.className = "lesson-edit-btn";
+      editBtn.textContent = "Edit";
+      editBtn.title = `Edit or delete ${titleEl.textContent}`;
+      editBtn.addEventListener("click", () => {
+        if (onEditCustomPreset) onEditCustomPreset(preset);
+      });
+
+      li.appendChild(info);
+      li.appendChild(editBtn);
+      list.appendChild(li);
+    });
+  },
+
   setGuitarBodyShape(guitarType) {
     const frame = document.getElementById("guitar-body-frame");
     frame.classList.remove("acoustic", "electric");
     if (guitarType === "Electric Guitar") {
       frame.classList.add("electric");
+      this.applyRoomTheme("theme-electric");
     } else {
       frame.classList.add("acoustic");
+      this.applyRoomTheme("theme-acoustic");
     }
   },
 
@@ -90,7 +154,6 @@ const Display = {
     const container = document.getElementById("string-buttons");
     container.innerHTML = "";
     strings.forEach((str, idx) => {
-      // Strip any legacy octave numbers so old saved presets also show clean letters like "D"
       const cleanNote = str.note.replace(/[0-9]/g, "");
       const btn = document.createElement("button");
       btn.type = "button";
@@ -263,6 +326,11 @@ const Display = {
     const li = document.createElement("li");
     li.className = "lesson-item";
 
+    const playBadge = document.createElement("span");
+    playBadge.className = "lesson-play-badge";
+    playBadge.textContent = "▶";
+    playBadge.setAttribute("aria-hidden", "true");
+
     const link = document.createElement("a");
     link.href = lesson.url;
     link.target = "_blank";
@@ -291,6 +359,7 @@ const Display = {
       if (onEditLesson) onEditLesson(lesson);
     });
 
+    li.appendChild(playBadge);
     li.appendChild(link);
     li.appendChild(editBtn);
     return li;
